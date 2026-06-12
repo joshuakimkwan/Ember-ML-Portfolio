@@ -1,0 +1,8 @@
+lumibot
+yfinance
+python-dotenv
+pandas
+numpy
+scikit-learn
+xgboost
+ta

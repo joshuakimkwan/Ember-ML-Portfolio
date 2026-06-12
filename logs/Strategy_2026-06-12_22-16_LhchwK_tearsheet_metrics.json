@@ -1,0 +1,403 @@
+{
+  "metadata": {
+    "start_date": "2024-06-30",
+    "end_date": "2024-11-20",
+    "total_days": 144,
+    "risk_free_rate": 0.04409999847412109,
+    "periods_per_year": 365,
+    "compounded": true,
+    "summary_only": true,
+    "quantstats_version": "1.1.5"
+  },
+  "scalar_metrics": {
+    "Start Period": {
+      "Benchmark": "2024-06-30",
+      "Strategy": "2024-06-30"
+    },
+    "End Period": {
+      "Benchmark": "2024-11-20",
+      "Strategy": "2024-11-20"
+    },
+    "Risk-Free Rate": {
+      "Benchmark": 0.0441,
+      "Strategy": 0.0441
+    },
+    "Time in Market": {
+      "Benchmark": 0.69,
+      "Strategy": 0.73
+    },
+    "Total Return": {
+      "Benchmark": 0.06,
+      "Strategy": 0.12
+    },
+    "CAGR% (Annual Return)": {
+      "Benchmark": 0.1481,
+      "Strategy": 0.3347
+    },
+    "Sharpe": {
+      "Benchmark": 0.54,
+      "Strategy": 3.13
+    },
+    "RoMaD": {
+      "Benchmark": 1.26,
+      "Strategy": 12.05
+    },
+    "Corr to Benchmark": {
+      "Benchmark": 1.0,
+      "Strategy": 0.31
+    },
+    "Prob. Sharpe Ratio": {
+      "Benchmark": 0.4757,
+      "Strategy": 0.9589
+    },
+    "Smart Sharpe": {
+      "Benchmark": 0.47,
+      "Strategy": 2.72
+    },
+    "Sortino": {
+      "Benchmark": 0.73,
+      "Strategy": 5.54
+    },
+    "Smart Sortino": {
+      "Benchmark": 0.63,
+      "Strategy": 4.82
+    },
+    "Sortino/\u221a2": {
+      "Benchmark": 0.51,
+      "Strategy": 3.92
+    },
+    "Smart Sortino/\u221a2": {
+      "Benchmark": 0.45,
+      "Strategy": 3.41
+    },
+    "Omega": {
+      "Benchmark": 1.1,
+      "Strategy": 2.18
+    },
+    "Max Drawdown": {
+      "Benchmark": -0.1175,
+      "Strategy": -0.0278
+    },
+    "Longest DD Days": {
+      "Benchmark": 93.0,
+      "Strategy": 27.0
+    },
+    "Volatility (ann.)": {
+      "Benchmark": 0.21559999999999999,
+      "Strategy": 0.0788
+    },
+    "R^2": {
+      "Benchmark": 0.1,
+      "Strategy": 0.1
+    },
+    "Information Ratio": {
+      "Benchmark": 0.03,
+      "Strategy": 0.03
+    },
+    "Calmar": {
+      "Benchmark": 1.26,
+      "Strategy": 12.05
+    },
+    "Skew": {
+      "Benchmark": -0.75,
+      "Strategy": 0.68
+    },
+    "Kurtosis": {
+      "Benchmark": 3.09,
+      "Strategy": 19.47
+    },
+    "Expected Daily%": {
+      "Benchmark": 0.0004,
+      "Strategy": 0.0008
+    },
+    "Expected Monthly%": {
+      "Benchmark": 0.0091,
+      "Strategy": 0.019
+    },
+    "Expected Yearly%": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "Daily Value-at-Risk": {
+      "Benchmark": -0.0181,
+      "Strategy": -0.006
+    },
+    "Expected Shortfall (cVaR)": {
+      "Benchmark": -0.026600000000000002,
+      "Strategy": -0.013000000000000001
+    },
+    "MTD": {
+      "Benchmark": 0.0116,
+      "Strategy": 0.0425
+    },
+    "3M": {
+      "Benchmark": 0.011699999999999999,
+      "Strategy": 0.0885
+    },
+    "6M": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "YTD": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "1Y": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "3Y (ann.)": {
+      "Benchmark": 0.1481,
+      "Strategy": 0.3347
+    },
+    "5Y (ann.)": {
+      "Benchmark": 0.1481,
+      "Strategy": 0.3347
+    },
+    "10Y (ann.)": {
+      "Benchmark": 0.1481,
+      "Strategy": 0.3347
+    },
+    "All-time (ann.)": {
+      "Benchmark": 0.1481,
+      "Strategy": 0.3347
+    },
+    "Best Day": {
+      "Benchmark": 0.0371,
+      "Strategy": 0.024900000000000002
+    },
+    "Worst Day": {
+      "Benchmark": -0.0482,
+      "Strategy": -0.024399999999999998
+    },
+    "Best Month": {
+      "Benchmark": 0.0323,
+      "Strategy": 0.0425
+    },
+    "Worst 1-Month Return": {
+      "Benchmark": -0.0304,
+      "Strategy": 0.0
+    },
+    "Best Year": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "Worst Year": {
+      "Benchmark": 0.0556,
+      "Strategy": 0.1197
+    },
+    "Avg. Drawdown": {
+      "Benchmark": -0.0673,
+      "Strategy": -0.0045000000000000005
+    },
+    "Avg. Drawdown Days": {
+      "Benchmark": 42.0,
+      "Strategy": 7.0
+    },
+    "Recovery Factor": {
+      "Benchmark": 0.54,
+      "Strategy": 4.11
+    },
+    "Ulcer Index": {
+      "Benchmark": 0.05,
+      "Strategy": 0.01
+    },
+    "Serenity Index": {
+      "Benchmark": 0.05,
+      "Strategy": 1.58
+    },
+    "Annualized Return on Risk Capital": {
+      "Benchmark": 1.1987,
+      "Strategy": 10.9211
+    },
+    "Worst 3-Month Return": {
+      "Benchmark": -0.002,
+      "Strategy": 0.0327
+    },
+    "Time to Recovery (Days)": {
+      "Benchmark": 72.0,
+      "Strategy": 5.0
+    },
+    "5th Percentile Tail Loss": {
+      "Benchmark": -0.022400000000000003,
+      "Strategy": -0.0021
+    },
+    "Time Underwater (Days)": {
+      "Benchmark": 127.0,
+      "Strategy": 100.0
+    },
+    "Percent Positive Months": {
+      "Benchmark": 0.6667000000000001,
+      "Strategy": 0.8332999999999999
+    },
+    "Avg. Up Month": {
+      "Benchmark": 0.0215,
+      "Strategy": 0.0275
+    },
+    "Avg. Down Month": {
+      "Benchmark": "-",
+      "Strategy": "-"
+    },
+    "Win Days": {
+      "Benchmark": 85.22,
+      "Strategy": 78.92
+    },
+    "Loss Days": {
+      "Benchmark": 58.78,
+      "Strategy": 65.08
+    },
+    "Win Days%": {
+      "Benchmark": 0.5918,
+      "Strategy": 0.5481
+    },
+    "Win Month%": {
+      "Benchmark": 0.8,
+      "Strategy": 1.0
+    },
+    "Win Quarter%": {
+      "Benchmark": 0.5,
+      "Strategy": 1.0
+    },
+    "Win Year%": {
+      "Benchmark": 1.0,
+      "Strategy": 1.0
+    },
+    "Beta": 0.11,
+    "Alpha": 0.27,
+    "Correlation": 0.3089,
+    "Treynor Ratio": 0.6689
+  },
+  "summary_tables": {
+    "eoy_returns_vs_benchmark": [
+      {
+        "year": 2024,
+        "strategy": 0.11967035669601911,
+        "benchmark": 0.05556224044691227,
+        "multiplier": 2.1538072571130362,
+        "won": true
+      }
+    ],
+    "drawdowns": [
+      {
+        "start": "2024-07-03",
+        "valley": "2024-07-04",
+        "end": "2024-07-04",
+        "days": 2.0,
+        "max drawdown": -0.06049088622677168,
+        "99% max drawdown": -0.027979879925088547
+      },
+      {
+        "start": "2024-07-06",
+        "valley": "2024-07-06",
+        "end": "2024-07-07",
+        "days": 2.0,
+        "max drawdown": -0.027495691043366577,
+        "99% max drawdown": null
+      },
+      {
+        "start": "2024-07-11",
+        "valley": "2024-07-11",
+        "end": "2024-07-16",
+        "days": 6.0,
+        "max drawdown": -0.25970057618145415,
+        "99% max drawdown": -0.07704611767282987
+      },
+      {
+        "start": "2024-07-19",
+        "valley": "2024-07-19",
+        "end": "2024-07-21",
+        "days": 3.0,
+        "max drawdown": -0.00976208287678526,
+        "99% max drawdown": null
+      },
+      {
+        "start": "2024-07-23",
+        "valley": "2024-08-07",
+        "end": "2024-08-18",
+        "days": 27.0,
+        "max drawdown": -1.6010766424126688,
+        "99% max drawdown": -1.37813888774575
+      },
+      {
+        "start": "2024-08-21",
+        "valley": "2024-08-21",
+        "end": "2024-08-28",
+        "days": 8.0,
+        "max drawdown": -0.1595286685245334,
+        "99% max drawdown": -0.12153639937533267
+      },
+      {
+        "start": "2024-08-31",
+        "valley": "2024-09-03",
+        "end": "2024-09-04",
+        "days": 5.0,
+        "max drawdown": -0.5621487883997522,
+        "99% max drawdown": -0.44058953555676794
+      },
+      {
+        "start": "2024-09-07",
+        "valley": "2024-09-09",
+        "end": "2024-09-09",
+        "days": 3.0,
+        "max drawdown": -0.07511017647400253,
+        "99% max drawdown": -0.02684536837291862
+      },
+      {
+        "start": "2024-09-13",
+        "valley": "2024-09-13",
+        "end": "2024-09-18",
+        "days": 6.0,
+        "max drawdown": -0.06218754646052371,
+        "99% max drawdown": -0.023606131081765902
+      },
+      {
+        "start": "2024-09-20",
+        "valley": "2024-09-21",
+        "end": "2024-09-23",
+        "days": 4.0,
+        "max drawdown": -0.22080222475655553,
+        "99% max drawdown": -0.2001398059085946
+      },
+      {
+        "start": "2024-09-26",
+        "valley": "2024-09-30",
+        "end": "2024-10-02",
+        "days": 7.0,
+        "max drawdown": -0.14102875927419767,
+        "99% max drawdown": -0.13594411143660334
+      },
+      {
+        "start": "2024-10-15",
+        "valley": "2024-10-16",
+        "end": "2024-10-21",
+        "days": 7.0,
+        "max drawdown": -0.09391664841436054,
+        "99% max drawdown": -0.0841843830291511
+      },
+      {
+        "start": "2024-10-23",
+        "valley": "2024-10-23",
+        "end": "2024-10-23",
+        "days": 1.0,
+        "max drawdown": -0.02573241534631343,
+        "99% max drawdown": null
+      },
+      {
+        "start": "2024-10-30",
+        "valley": "2024-10-31",
+        "end": "2024-11-05",
+        "days": 7.0,
+        "max drawdown": -2.777484793318563,
+        "99% max drawdown": -2.762501637187309
+      },
+      {
+        "start": "2024-11-09",
+        "valley": "2024-11-12",
+        "end": "2024-11-20",
+        "days": 12.0,
+        "max drawdown": -0.6975188332073001,
+        "99% max drawdown": -0.4783293818638623
+      }
+    ]
+  }
+}
