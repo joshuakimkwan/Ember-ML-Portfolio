@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 lumibot
 yfinance
 python-dotenv
@@ -5,4 +6,13 @@ pandas
 numpy
 scikit-learn
 xgboost
+=======
+lumibot
+yfinance
+python-dotenv
+pandas
+numpy
+scikit-learn
+xgboost
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 ta

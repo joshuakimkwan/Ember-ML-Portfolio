@@ -30,7 +30,11 @@ class Strategy(_LumibotStrategy):
         self.sleeptime = P.SLEEPTIME
 
         # For trading crypto
+<<<<<<< HEAD
         # self.set_market('24/7')
+=======
+        self.set_market('24/7')
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
         
         # Build asset objects
         self.equity_assets = {
@@ -57,8 +61,11 @@ class Strategy(_LumibotStrategy):
         self.paused = False
         self.asset_returns = {s: pd.Series(dtype=float) for s in self.all_symbols}
         self._prev_features = {}  # features from prior iteration for labeling
+<<<<<<< HEAD
         self.target_streak = {} # CHANGED (12062026) {symbol: consecutive iterations with positive target weight}
         self.exit_streak = {} # CHANGED (12062026) {symbol: consecutive iterations a held position is out of targets}
+=======
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 
         self.log_message(
             f"ML Strategy initialized | universe={len(self.all_symbols)} assets | "
@@ -172,8 +179,11 @@ class Strategy(_LumibotStrategy):
         if self._prev_features and self.prev_prices:
             for symbol, feat in self._prev_features.items():
                 if symbol in current_prices and symbol in self.prev_prices:
+<<<<<<< HEAD
                     if self.prev_prices[symbol] == current_prices[symbol]:
                         continue  # CHANGED (12062026) stale bar (market closed, price unchanged) — skip
+=======
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
                     target = TradingModel.compute_target(
                         self.prev_prices[symbol], current_prices[symbol]
                     )
@@ -228,6 +238,7 @@ class Strategy(_LumibotStrategy):
             signals, self.tracker, portfolio_value, current_drawdown
         )
 
+<<<<<<< HEAD
         # -- Entry persistence: update consecutive-target streaks -- CHANGED (12062026)
         for symbol in self.all_symbols:
             if target_weights.get(symbol, 0) > 0:
@@ -249,6 +260,8 @@ class Strategy(_LumibotStrategy):
             else:
                 self.exit_streak[symbol] = 0
 
+=======
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
         # -- Execute orders --
         self._rebalance(target_weights, current_prices, portfolio_value)
 
@@ -264,13 +277,17 @@ class Strategy(_LumibotStrategy):
     # ------------------------------------------------------------------
     def _rebalance(self, target_weights, prices, portfolio_value):
         """Rebalance portfolio to match target weights. Sells first, then buys."""
+<<<<<<< HEAD
         available_cash = float(self.get_cash()) # CHANGED (12062025) to check cash before buying to avoid negative cash
 
+=======
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
         current_positions = {}
         for p in self.get_positions():
             sym = p.asset.symbol
             current_positions[sym] = p
 
+<<<<<<< HEAD
         # -- Sell: exit positions not in targets or with negative weight -- 
         for symbol, position in current_positions.items():
             target_w = target_weights.get(symbol, 0)
@@ -280,6 +297,14 @@ class Strategy(_LumibotStrategy):
                 order = self.create_order(symbol, position.quantity, "sell")
                 self.submit_order(order)
                 self.exit_streak.pop(symbol, None) # CHANGED (12062026)
+=======
+        # -- Sell: exit positions not in targets or with negative weight --
+        for symbol, position in current_positions.items():
+            target_w = target_weights.get(symbol, 0)
+            if target_w <= 0 and position.quantity > 0:
+                order = self.create_order(symbol, position.quantity, "sell")
+                self.submit_order(order)
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
                 self.log_message(f"SELL ALL {symbol}: qty={position.quantity}")
 
         # -- Buy / adjust remaining positions --
@@ -291,13 +316,18 @@ class Strategy(_LumibotStrategy):
             if not price or price <= 0:
                 continue
 
+<<<<<<< HEAD
             target_value = abs(weight) * portfolio_value * 0.65 # CHANGED (12062026) from *1 to *0.6 to reduce amount transacted each trade
+=======
+            target_value = abs(weight) * portfolio_value
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
             current_value = 0
             current_qty = 0
             if symbol in current_positions:
                 current_qty = current_positions[symbol].quantity
                 current_value = current_qty * price
 
+<<<<<<< HEAD
             tolerance = 0.4 * current_value # CHANGED (12062026) included now to ignore rebalance for small price movements
             diff_value = target_value - current_value
             cash_reserve = available_cash * (P.CASH_BUFFER) # CHANGED (06122026)
@@ -306,6 +336,11 @@ class Strategy(_LumibotStrategy):
             if abs(diff_value) < tolerance or abs(diff_value) > cash_reserve:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
                 continue
             # CHANGED (12062026) abs(diff_value) > cash_reserve to prevent overspending.
+=======
+            diff_value = target_value - current_value
+            if abs(diff_value) < 10:  # skip tiny adjustments
+                continue
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 
             # Crypto allows fractional, stocks need whole shares
             is_crypto = symbol in P.CRYPTO_SYMBOLS
