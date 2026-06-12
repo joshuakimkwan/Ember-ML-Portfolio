@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 lumibot
 python-dotenv
 pandas
 numpy
+=======
+lumibot
+python-dotenv
+pandas
+numpy
+>>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 scikit-learn
