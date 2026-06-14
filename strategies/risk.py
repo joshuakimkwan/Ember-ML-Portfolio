@@ -34,6 +34,7 @@ class DecayTracker:
         n = len(preds)
         weights = np.array([P.DECAY_RATE ** (n - 1 - i) for i in range(n)])
         values = np.array([float(p) for p in preds])
+
         prior_weight = P.TRACKER_PRIOR_WEIGHT
         total_weight = np.sum(weights) + prior_weight
         blended = np.sum(weights * values) + prior_weight * P.INITIAL_ACCURACY

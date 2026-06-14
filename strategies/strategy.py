@@ -30,7 +30,9 @@ class Strategy(_LumibotStrategy):
         self.sleeptime = P.SLEEPTIME
 
         # For trading crypto
+
         # self.set_market('24/7')
+
         
         # Build asset objects
         self.equity_assets = {
@@ -57,6 +59,7 @@ class Strategy(_LumibotStrategy):
         self.paused = False
         self.asset_returns = {s: pd.Series(dtype=float) for s in self.all_symbols}
         self._prev_features = {}  # features from prior iteration for labeling
+
         self.target_streak = {} # CHANGED (12062026) {symbol: consecutive iterations with positive target weight}
         self.exit_streak = {} # CHANGED (12062026) {symbol: consecutive iterations a held position is out of targets}
 
@@ -172,8 +175,10 @@ class Strategy(_LumibotStrategy):
         if self._prev_features and self.prev_prices:
             for symbol, feat in self._prev_features.items():
                 if symbol in current_prices and symbol in self.prev_prices:
+
                     if self.prev_prices[symbol] == current_prices[symbol]:
                         continue  # CHANGED (12062026) stale bar (market closed, price unchanged) — skip
+
                     target = TradingModel.compute_target(
                         self.prev_prices[symbol], current_prices[symbol]
                     )
@@ -228,6 +233,7 @@ class Strategy(_LumibotStrategy):
             signals, self.tracker, portfolio_value, current_drawdown
         )
 
+
         # -- Entry persistence: update consecutive-target streaks -- CHANGED (12062026)
         for symbol in self.all_symbols:
             if target_weights.get(symbol, 0) > 0:
@@ -264,6 +270,7 @@ class Strategy(_LumibotStrategy):
     # ------------------------------------------------------------------
     def _rebalance(self, target_weights, prices, portfolio_value):
         """Rebalance portfolio to match target weights. Sells first, then buys."""
+
         available_cash = float(self.get_cash()) # CHANGED (12062025) to check cash before buying to avoid negative cash
 
         current_positions = {}
@@ -280,6 +287,7 @@ class Strategy(_LumibotStrategy):
                 order = self.create_order(symbol, position.quantity, "sell")
                 self.submit_order(order)
                 self.exit_streak.pop(symbol, None) # CHANGED (12062026)
+
                 self.log_message(f"SELL ALL {symbol}: qty={position.quantity}")
 
         # -- Buy / adjust remaining positions --
@@ -291,7 +299,9 @@ class Strategy(_LumibotStrategy):
             if not price or price <= 0:
                 continue
 
+
             target_value = abs(weight) * portfolio_value * 0.65 # CHANGED (12062026) from *1 to *0.6 to reduce amount transacted each trade
+
             current_value = 0
             current_qty = 0
             if symbol in current_positions:
@@ -299,6 +309,7 @@ class Strategy(_LumibotStrategy):
                 current_value = current_qty * price
 
             tolerance = 0.05 * current_value # CHANGED (12062026) included now to ignore rebalance for small price movements
+
             diff_value = target_value - current_value
             cash_reserve = available_cash * (P.CASH_BUFFER) # CHANGED (06122026)
             max_order_notional = 100000 # CHANGED (06122026)

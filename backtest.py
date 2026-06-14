@@ -60,8 +60,8 @@ BUDGET = 1_000_000
 # Backtest window (both bounds inclusive). Set either to ``None`` to defer
 # entirely to the date range available in your CSV files. Defaults align
 # with the official competition trading window (1-31 August 2026, SGT).
-BACKTEST_START: datetime | None = datetime(2024, 7, 1)
-BACKTEST_END: datetime | None = datetime(2024, 11, 20)
+BACKTEST_START: datetime | None = datetime(2025, 1, 1)
+BACKTEST_END: datetime | None = datetime(2025, 1, 11)
 
 # When True, the harness aborts if a symbol declared in ``params.py`` has
 # no matching CSV in ``DATA_DIR``. When False the symbol is skipped with a
@@ -83,8 +83,8 @@ BUY_FLAT_FEE = 0.0
 SELL_FLAT_FEE = 0.0
 
 # Fee as a fraction of trade notional. 0.0005 == 5 basis points.
-BUY_PERCENT_FEE = 0.0007
-SELL_PERCENT_FEE = 0.0007
+BUY_PERCENT_FEE = 0.0
+SELL_PERCENT_FEE = 0.0
 
 # Per-contract fee (only relevant for options / futures).
 PER_CONTRACT_FEE = 0.0
