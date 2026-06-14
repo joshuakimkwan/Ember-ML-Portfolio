@@ -13,15 +13,10 @@ CRYPTO_BENCH = "BTC"
 SLEEPTIME = "60M"
 MAX_POSITIONS = 5
 MAX_WEIGHT_PER_POSITION = 0.40
-<<<<<<< HEAD
-CASH_BUFFER = 0.3 # CHANGED from 0.05 to prevent spending $100000 on each buy/sell. The dollar amount transacted initially is too high.
+CASH_BUFFER = 0.05 # CHANGED from 0.05 to prevent spending $100000 on each buy/sell. The dollar amount transacted initially is too high.
 MIN_CONFIDENCE = 0.2
 ENTRY_PERSISTENCE = 2 # CHANGED (12062026) added line to only BUY if it has appeared in the target list for N consecutive iterations.
 EXIT_PERSISTENCE = 2 # CHANGED (12062026) added line to only SELL if it has been out of the target list for N consecutive iterations.
-=======
-CASH_BUFFER = 0.05
-MIN_CONFIDENCE = 0.1
->>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 
 # ── Risk ────────────────────────────────────────────────
 MAX_DRAWDOWN = 0.35
@@ -40,15 +35,8 @@ RETRAIN_INTERVAL = 24  # iterations (hours)
 # ── Decay tracker ──────────────────────────────────────
 DECAY_RATE = 0.97
 INITIAL_ACCURACY = 0.5
-<<<<<<< HEAD
 TRACKER_PRIOR_WEIGHT = 10.0  # CHANGED (06122026) pseudo-observations anchoring score to INITIAL_ACCURACY
 
 # ── Feature engineering ────────────────────────────────
 MIN_HISTORY_BARS = 60
 RETURN_DEAD_ZONE = 0.003  # +/-0.1% CHANGED (12062026) from 0.001 to 0.003
-=======
-
-# ── Feature engineering ────────────────────────────────
-MIN_HISTORY_BARS = 60
-RETURN_DEAD_ZONE = 0.001  # +/-0.1%
->>>>>>> e1646a59097e74270aee44d37c54b2a25f477887

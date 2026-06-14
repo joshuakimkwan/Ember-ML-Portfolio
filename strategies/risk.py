@@ -34,17 +34,11 @@ class DecayTracker:
         n = len(preds)
         weights = np.array([P.DECAY_RATE ** (n - 1 - i) for i in range(n)])
         values = np.array([float(p) for p in preds])
-<<<<<<< HEAD
         prior_weight = P.TRACKER_PRIOR_WEIGHT
         total_weight = np.sum(weights) + prior_weight
         blended = np.sum(weights * values) + prior_weight * P.INITIAL_ACCURACY
         if total_weight > 0:
             self.accuracy_scores[symbol] = float(blended / total_weight)
-=======
-        total_weight = np.sum(weights)
-        if total_weight > 0:
-            self.accuracy_scores[symbol] = float(np.sum(weights * values) / total_weight)
->>>>>>> e1646a59097e74270aee44d37c54b2a25f477887
 
     def get_score(self, symbol: str) -> float:
         """Get current accuracy score for an asset (0.0 to 1.0)."""
