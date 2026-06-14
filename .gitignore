@@ -1,5 +1,5 @@
 data/
 logs/
 __MACOSX/
-*.txt
+backtest_run_output.txt
 *.rar
