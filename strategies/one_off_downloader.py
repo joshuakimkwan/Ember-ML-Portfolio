@@ -85,7 +85,7 @@ def _download(symbol: str, interval: str, period: str) -> pd.DataFrame:
 def main():
     period = _period_for(INTERVAL)
     DATA_DIR.mkdir(exist_ok=True)
-    symbols = P.STOCK_SLEEVE_SYMBOLS + P.CRYPTO_SLEEVE_SYMBOLS
+    symbols = P.STOCK_SLEEVE_SYMBOLS + P.CRYPTO_SLEEVE_SYMBOLS + [P.STOCK_BENCH]
 
     print(f"Interval : {INTERVAL}  (period={period})")
     print(f"Symbols  : {len(symbols)}")

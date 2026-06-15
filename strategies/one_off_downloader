@@ -1,6 +1,0 @@
-import yfinance as yf
-ticker = yf.Ticker("AAPL")
-
-data = ticker.history(period="1y")
-
-data.to_csv("aapl_historical_data.csv")
