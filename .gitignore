@@ -2,3 +2,4 @@ logs/
 __MACOSX/
 backtest_run_output.txt
 *.rar
+strategies/__pycache__/

@@ -367,9 +367,14 @@ class Strategy(_LumibotStrategy):
             diff_value = target_value - current_value
             cash_reserve = available_cash * (P.CASH_BUFFER) # CHANGED (06122026)
             max_order_notional = 100000 # CHANGED (06122026)
+<<<<<<< HEAD
             spendable = available_cash - cash_reserve
             diff_value = min(diff_value, max_order_notional, spendable) # CHANGED (06122026)
             if abs(diff_value) < tolerance or (available_cash - abs(diff_value)) < cash_reserve or diff_value <= 0:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
+=======
+            diff_value = min(diff_value, max_order_notional) # CHANGED (06122026)
+            if abs(diff_value) < tolerance or (available_cash - abs(diff_value)) < cash_reserve:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
+>>>>>>> 106ea96a8f16c95a099ee5872b9d4efbf1883932
                 continue
             # CHANGED (12062026) abs(diff_value) > cash_reserve to prevent overspending.
 
