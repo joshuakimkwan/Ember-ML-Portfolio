@@ -25,6 +25,10 @@ class TradingModel:
             learning_rate=P.LEARNING_RATE,
             subsample=P.SUBSAMPLE,
             colsample_bytree=P.COLSAMPLE_BYTREE,
+            min_child_weight=P.MIN_CHILD_WEIGHT,
+            gamma=P.GAMMA,
+            reg_alpha=P.REG_ALPHA,
+            reg_lambda=P.REG_LAMBDA,
             objective="multi:softprob",
             num_class=3,
             eval_metric="mlogloss",
@@ -73,7 +77,8 @@ class TradingModel:
         sample_weights = compute_sample_weight("balanced", y_train)
 
         model = self._build_model()
-        model.fit(X_train, y_train, sample_weight=sample_weights)
+        model.set_params(early_stopping_rounds=30, eval_set=[(X_val, y_val)], verbose=False)
+        model.fit(X_train, y_train, sample_weight=sample_weights, eval_set=[(X_val, y_val)], verbose=False)
 
         val_preds = model.predict(X_val)
         val_accuracy = (val_preds == y_val).mean()
