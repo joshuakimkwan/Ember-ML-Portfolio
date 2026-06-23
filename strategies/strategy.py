@@ -48,7 +48,8 @@ class Strategy(_LumibotStrategy):
         self.all_symbols = list(self.all_assets.keys())
 
         # ML model and adaptive tracker
-        self.model = TradingModel()
+        # self.model = TradingModel()
+        self.models = {s: TradingModel(symbol=s) for s in self.all_symbols} # CHANGED (18062026)
         self.tracker = DecayTracker(self.all_symbols)
 
         # State tracking
@@ -62,6 +63,9 @@ class Strategy(_LumibotStrategy):
 
         self.target_streak = {} # CHANGED (12062026) {symbol: consecutive iterations with positive target weight}
         self.exit_streak = {} # CHANGED (12062026) {symbol: consecutive iterations a held position is out of targets}
+
+        self.entry_prices = {}      # CHANGED (21062026) {symbol: price at which we last bought}
+        self.last_sold_prices = {}  # CHANGED (21062026) {symbol: price at which we last sold}
 
         self.log_message(
             f"ML Strategy initialized | universe={len(self.all_symbols)} assets | "
@@ -182,7 +186,8 @@ class Strategy(_LumibotStrategy):
                     target = TradingModel.compute_target(
                         self.prev_prices[symbol], current_prices[symbol]
                     )
-                    self.model.add_sample(feat, target)
+                    # self.model.add_sample(feat, target)
+                    self.models[symbol].add_sample(feat, target)
 
         # -- Feature engineering + prediction --
         signals = {}
@@ -197,8 +202,11 @@ class Strategy(_LumibotStrategy):
                     features[k] = v
 
                 current_features[symbol] = features
-                direction, confidence = self.model.predict(features)
-                signals[symbol] = (direction, confidence)
+                # direction, confidence = self.model.predict(features)
+                # signals[symbol] = (direction, confidence)
+                if self.models[symbol].model is not None: # CHANGED (18062026)
+                    direction, confidence = self.models[symbol].predict(features)
+                    signals[symbol] = (direction, confidence)
             except Exception as e:
                 self.log_message(f"Feature/predict error for {symbol}: {e}")
                 continue
@@ -209,22 +217,41 @@ class Strategy(_LumibotStrategy):
         self.prev_prices = current_prices.copy()
 
         # -- Train / retrain model --
-        if self.iteration_count == 1 or self.iteration_count % P.RETRAIN_INTERVAL == 0:
-            if self.model.has_enough_data():
-                try:
-                    success = self.model.train()
-                    self.log_message(
-                        f"Model retrain: {'updated' if success else 'kept previous'} | "
-                        f"samples={len(self.model.feature_history)} | "
-                        f"val_acc={self.model.last_val_accuracy:.3f}"
-                    )
-                except Exception as e:
-                    self.log_message(f"Retrain failed: {e}")
+        # if self.iteration_count == 1 or self.iteration_count % P.RETRAIN_INTERVAL == 0:
+        #     if self.model.has_enough_data():
+        #         try:
+        #             success = self.model.train()
+        #             self.log_message(
+        #                 f"Model retrain: {'updated' if success else 'kept previous'} | "
+        #                 f"samples={len(self.model.feature_history)} | "
+        #                 f"val_acc={self.model.last_val_accuracy:.3f}"
+        #             )
+        #         except Exception as e:
+        #             self.log_message(f"Retrain failed: {e}")
+        if self.iteration_count == 1 or self.iteration_count % P.RETRAIN_INTERVAL == 0: # CHANGED (18062026) from above
+            for symbol, mdl in self.models.items():
+                if mdl.has_enough_data():
+                    try:
+                        success = mdl.train()
+                        self.log_message(
+                            f"Model retrain [{symbol}]: {'updated' if success else 'kept previous'} | "
+                            f"samples={len(mdl.feature_history)} | "
+                            f"val_acc={mdl.last_val_accuracy:.3f}"
+                        )
+                    except Exception as e:
+                        self.log_message(f"Retrain failed [{symbol}]: {e}")
 
         # -- If model not ready yet, stay in cash --
-        if self.model.model is None:
+        # if self.model.model is None:
+        #     self.log_message(
+        #         f"Collecting data: {len(self.model.feature_history)}/{P.MIN_TRAINING_SAMPLES} samples"
+        #     )
+        #     return
+        ready_count = sum(1 for m in self.models.values() if m.model is not None) # CHANGED (18062026) from above
+        if ready_count == 0:
+            total_samples = sum(len(m.feature_history) for m in self.models.values())
             self.log_message(
-                f"Collecting data: {len(self.model.feature_history)}/{P.MIN_TRAINING_SAMPLES} samples"
+                f"Collecting data: {total_samples} total samples, no models ready yet"
             )
             return
 
@@ -265,6 +292,15 @@ class Strategy(_LumibotStrategy):
             f"positions={len(target_weights)} | signals={len(signals)}"
         )
 
+        # -- Out of sample testing --
+        if self.iteration_count == 1:
+            self._oos_logged = False
+        if not hasattr(self, '_oos_logged'):
+            self._oos_logged = False
+        if not self._oos_logged and str(self.get_datetime().date()) >= "2025-07-01":
+            self.log_message(f"=== OOS START === portfolio=${portfolio_value:,.2f}")
+            self._oos_logged = True
+
     # ------------------------------------------------------------------
     # Order execution
     # ------------------------------------------------------------------
@@ -284,10 +320,24 @@ class Strategy(_LumibotStrategy):
             if target_w <= 0 and position.quantity > 0:
                 if self.exit_streak.get(symbol, 0) < P.EXIT_PERSISTENCE:
                     continue  # CHANGED (12062026) now included, signal must stay dead for N consecutive hours before exiting
+
+                price = prices.get(symbol, 0) # CHANGED (21062026)
+                entry_price = self.entry_prices.get(symbol, 0)
+
+                # Stop-loss override: always allow sell if position is down too much
+                if entry_price > 0 and price > 0: # CHANGED (21062026)
+                    position_return = (price - entry_price) / entry_price
+                    is_stop_loss = position_return <= -P.MAX_POSITION_LOSS
+                    meets_profit_target = price >= entry_price * (1 + P.MIN_SELL_PROFIT)
+                    if not meets_profit_target and not is_stop_loss:
+                        continue  # price hasn't moved enough to justify selling
+
                 order = self.create_order(symbol, position.quantity, "sell")
                 self.submit_order(order)
                 self.exit_streak.pop(symbol, None) # CHANGED (12062026)
-
+                self.last_sold_prices[symbol] = price  # CHANGED (21062026) track sold price
+                self.entry_prices.pop(symbol, None)    # CHANGED (21062026) clear entry price
+                
                 self.log_message(f"SELL ALL {symbol}: qty={position.quantity}")
 
         # -- Buy / adjust remaining positions --
@@ -299,6 +349,10 @@ class Strategy(_LumibotStrategy):
             if not price or price <= 0:
                 continue
 
+            # CHANGED (21062026) Buy-back threshold: only buy if price has dropped enough from last sold price
+            last_sold = self.last_sold_prices.get(symbol)
+            if last_sold is not None and price > last_sold * (1 - P.MIN_BUYBACK_DROP):
+                continue  # price hasn't dropped enough since we last sold
 
             target_value = abs(weight) * portfolio_value * 0.65 # CHANGED (12062026) from *1 to *0.6 to reduce amount transacted each trade
 
@@ -313,8 +367,9 @@ class Strategy(_LumibotStrategy):
             diff_value = target_value - current_value
             cash_reserve = available_cash * (P.CASH_BUFFER) # CHANGED (06122026)
             max_order_notional = 100000 # CHANGED (06122026)
-            diff_value = min(diff_value, max_order_notional) # CHANGED (06122026)
-            if abs(diff_value) < tolerance or abs(diff_value) > cash_reserve:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
+            spendable = available_cash - cash_reserve
+            diff_value = min(diff_value, max_order_notional, spendable) # CHANGED (06122026)
+            if abs(diff_value) < tolerance or (available_cash - abs(diff_value)) < cash_reserve or diff_value <= 0:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
                 continue
             # CHANGED (12062026) abs(diff_value) > cash_reserve to prevent overspending.
 
@@ -330,15 +385,18 @@ class Strategy(_LumibotStrategy):
 
             if diff_value > 0:
                 order = self.create_order(symbol, quantity, "buy")
+                self.submit_order(order)
+                self.entry_prices[symbol] = price  # track entry price
+                self.last_sold_prices.pop(symbol, None)  # clear sold price
                 self.log_message(f"BUY {symbol}: qty={quantity} @ ${price:,.2f}")
             else:
                 quantity = min(quantity, current_qty)
                 if quantity > 0:
                     order = self.create_order(symbol, quantity, "sell")
+                    self.submit_order(order)
                     self.log_message(f"SELL {symbol}: qty={quantity} @ ${price:,.2f}")
                 else:
                     continue
-            self.submit_order(order)
 
     def _sell_all(self):
         """Liquidate all positions (used when max drawdown is hit)."""
