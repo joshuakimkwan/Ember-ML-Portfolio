@@ -60,8 +60,8 @@ BUDGET = 1_000_000
 # Backtest window (both bounds inclusive). Set either to ``None`` to defer
 # entirely to the date range available in your CSV files. Defaults align
 # with the official competition trading window (1-31 August 2026, SGT).
-BACKTEST_START: datetime | None = datetime(2025, 7, 1)
-BACKTEST_END: datetime | None = datetime(2026, 6, 12)
+BACKTEST_START: datetime | None = datetime(2024, 7, 1)
+BACKTEST_END: datetime | None = datetime(2026, 6, 1)
 
 # When True, the harness aborts if a symbol declared in ``params.py`` has
 # no matching CSV in ``DATA_DIR``. When False the symbol is skipped with a

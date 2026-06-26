@@ -65,7 +65,8 @@ class Strategy(_LumibotStrategy):
         self.exit_streak = {} # CHANGED (12062026) {symbol: consecutive iterations a held position is out of targets}
 
         self.entry_prices = {}      # CHANGED (21062026) {symbol: price at which we last bought}
-        self.last_sold_prices = {}  # CHANGED (21062026) {symbol: price at which we last sold}
+        # self.last_sold_prices = {}  # CHANGED (21062026) {symbol: price at which we last sold}
+        self.accumulated_fees = {}
 
         self.log_message(
             f"ML Strategy initialized | universe={len(self.all_symbols)} assets | "
@@ -229,6 +230,7 @@ class Strategy(_LumibotStrategy):
         #         except Exception as e:
         #             self.log_message(f"Retrain failed: {e}")
         if self.iteration_count == 1 or self.iteration_count % P.RETRAIN_INTERVAL == 0: # CHANGED (18062026) from above
+            # self.last_sold_prices.clear()  # clear stale buyback memory each retrain cycle
             for symbol, mdl in self.models.items():
                 if mdl.has_enough_data():
                     try:
@@ -328,15 +330,20 @@ class Strategy(_LumibotStrategy):
                 if entry_price > 0 and price > 0: # CHANGED (21062026)
                     position_return = (price - entry_price) / entry_price
                     is_stop_loss = position_return <= -P.MAX_POSITION_LOSS
-                    meets_profit_target = price >= entry_price * (1 + P.MIN_SELL_PROFIT)
+                    total_entry_value = position.quantity * entry_price
+                    total_buy_fees = self.accumulated_fees.get(symbol, 0)
+                    sell_fee = position.quantity * price * P.PERCENT_FEE_PER_SIDE
+                    min_profit_needed = (total_buy_fees + sell_fee) * P.MIN_SELL_PROFIT_MULTIPLIER / total_entry_value
+                    meets_profit_target = position_return >= min_profit_needed
                     if not meets_profit_target and not is_stop_loss:
                         continue  # price hasn't moved enough to justify selling
 
                 order = self.create_order(symbol, position.quantity, "sell")
                 self.submit_order(order)
                 self.exit_streak.pop(symbol, None) # CHANGED (12062026)
-                self.last_sold_prices[symbol] = price  # CHANGED (21062026) track sold price
+                # self.last_sold_prices[symbol] = price  # CHANGED (21062026) track sold price
                 self.entry_prices.pop(symbol, None)    # CHANGED (21062026) clear entry price
+                self.accumulated_fees.pop(symbol, None)
                 
                 self.log_message(f"SELL ALL {symbol}: qty={position.quantity}")
 
@@ -350,9 +357,10 @@ class Strategy(_LumibotStrategy):
                 continue
 
             # CHANGED (21062026) Buy-back threshold: only buy if price has dropped enough from last sold price
-            last_sold = self.last_sold_prices.get(symbol)
-            if last_sold is not None and price > last_sold * (1 - P.MIN_BUYBACK_DROP):
-                continue  # price hasn't dropped enough since we last sold
+            # last_sold = self.last_sold_prices.get(symbol)
+            # if last_sold is not None: # and price > last_sold * (1 - P.MIN_BUYBACK_DROP):
+            #     self.log_message(f"[BUYBACK BLOCKED] {symbol}: price=${price:.2f} > sold=${last_sold:.2f} * {1 - P.MIN_BUYBACK_DROP:.4f} = ${last_sold * (1 - P.MIN_BUYBACK_DROP):.2f}")
+            #     continue
 
             target_value = abs(weight) * portfolio_value * 0.65 # CHANGED (12062026) from *1 to *0.6 to reduce amount transacted each trade
 
@@ -367,14 +375,9 @@ class Strategy(_LumibotStrategy):
             diff_value = target_value - current_value
             cash_reserve = available_cash * (P.CASH_BUFFER) # CHANGED (06122026)
             max_order_notional = 100000 # CHANGED (06122026)
-<<<<<<< HEAD
             spendable = available_cash - cash_reserve
             diff_value = min(diff_value, max_order_notional, spendable) # CHANGED (06122026)
             if abs(diff_value) < tolerance or (available_cash - abs(diff_value)) < cash_reserve or diff_value <= 0:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
-=======
-            diff_value = min(diff_value, max_order_notional) # CHANGED (06122026)
-            if abs(diff_value) < tolerance or (available_cash - abs(diff_value)) < cash_reserve:  # skip tiny adjustments, also CHANGED from 10 to tolerance to ignore rebalance for small price movements
->>>>>>> 106ea96a8f16c95a099ee5872b9d4efbf1883932
                 continue
             # CHANGED (12062026) abs(diff_value) > cash_reserve to prevent overspending.
 
@@ -391,8 +394,16 @@ class Strategy(_LumibotStrategy):
             if diff_value > 0:
                 order = self.create_order(symbol, quantity, "buy")
                 self.submit_order(order)
-                self.entry_prices[symbol] = price  # track entry price
-                self.last_sold_prices.pop(symbol, None)  # clear sold price
+                available_cash -= quantity * price * (1 + P.PERCENT_FEE_PER_SIDE) # To avoid negative cash
+                # self.entry_prices[symbol] = price  # track entry price
+                old_price = self.entry_prices.get(symbol, 0)
+                old_qty = current_qty
+                # self.last_sold_prices.pop(symbol, None)  # clear sold price
+                if old_price > 0 and old_qty > 0:
+                    self.entry_prices[symbol] = (old_qty * old_price + quantity * price) / (old_qty + quantity)
+                else:
+                    self.entry_prices[symbol] = price
+                self.accumulated_fees[symbol] = self.accumulated_fees.get(symbol, 0) + quantity * price * P.PERCENT_FEE_PER_SIDE
                 self.log_message(f"BUY {symbol}: qty={quantity} @ ${price:,.2f}")
             else:
                 quantity = min(quantity, current_qty)

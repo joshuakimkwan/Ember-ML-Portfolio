@@ -1,7 +1,7 @@
 """Shared parameters for the ML trading strategy."""
 
 # ── Asset universe ──────────────────────────────────────
-STOCK_SLEEVE_SYMBOLS = ["TSLA", "NVDA", "AAPL", "AMZN", "META", "MSFT", "GOOGL", "AMD"]
+STOCK_SLEEVE_SYMBOLS = ["TSLA", "NVDA", "AAPL", "GOOGL", "AMD", "LLY", "ABBV", "VRTX"] # Removed AMZN, META, MSFT, included Pharma, for diversification
 CRYPTO_SLEEVE_SYMBOLS = ["BTC", "ETH", "SOL", "DOGE", "XRP", "AVAX", "LINK"]
 CRYPTO_SYMBOLS = set(CRYPTO_SLEEVE_SYMBOLS)
 ALL_SYMBOLS = STOCK_SLEEVE_SYMBOLS + CRYPTO_SLEEVE_SYMBOLS
@@ -25,11 +25,11 @@ PERCENT_FEE_PER_SIDE = 0.0007   # 7 bps per side, must match backtest.py
 # ── Trade thresholds (as multiples of round-trip cost) ──
 ROUND_TRIP_COST = 2 * PERCENT_FEE_PER_SIDE  # 0.0014 = 14 bps TOASK to import backtest??
 MIN_SELL_PROFIT_MULTIPLIER = 1.5   # sell only if profit >= 2.5× round-trip cost
-MIN_BUYBACK_MULTIPLIER = 0.5      # buy back only if price dropped >= 0.6× round-trip cost
+# MIN_BUYBACK_MULTIPLIER = 0.5      # buy back only if price dropped >= 0.6× round-trip cost
 
 MIN_SELL_PROFIT = ROUND_TRIP_COST * MIN_SELL_PROFIT_MULTIPLIER      # CHANGED (21062026) only sell if price >= entry * (1 + this)
-MIN_BUYBACK_DROP = ROUND_TRIP_COST * MIN_BUYBACK_MULTIPLIER     # CHANGED (21062026) only buy back if price <= last_sold * (1 - this) 0.00084
-MAX_POSITION_LOSS = 0.075      # CHANGED (21062026) stop-loss override: sell if down more than this (recommended). Original is 0.05 drop (5% drop of price bought)
+# MIN_BUYBACK_DROP = ROUND_TRIP_COST * MIN_BUYBACK_MULTIPLIER     # CHANGED (21062026) only buy back if price <= last_sold * (1 - this) 0.00084
+MAX_POSITION_LOSS = 0.06      # CHANGED (21062026) stop-loss override: sell if down more than this (recommended). Original is 0.05 drop (5% drop of price bought)
 
 # ── Risk ────────────────────────────────────────────────
 MAX_DRAWDOWN = 0.35
