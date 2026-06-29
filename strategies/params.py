@@ -35,6 +35,7 @@ MAX_POSITION_LOSS = 0.06      # CHANGED (21062026) stop-loss override: sell if d
 MAX_DRAWDOWN = 0.35
 DRAWDOWN_SCALING_START = 0.20
 DRAWDOWN_RECOVERY = 0.25
+STOP_LOSS_COOLDOWN_HOURS = 36
 
 # ── XGBoost model ──────────────────────────────────────
 N_ESTIMATORS = 900
@@ -43,13 +44,13 @@ LEARNING_RATE = 0.029241
 SUBSAMPLE =0.9653
 COLSAMPLE_BYTREE = 0.5291
 MIN_TRAINING_SAMPLES = 800
-RETRAIN_INTERVAL = 120  # iterations (hours)
+RETRAIN_INTERVAL = 96  # iterations (hours)
 
 # ── Decay tracker ──────────────────────────────────────
 DECAY_RATE = 0.97
 INITIAL_ACCURACY = 0.5
 
-TRACKER_PRIOR_WEIGHT = 10.0  # CHANGED (06122026) pseudo-observations anchoring score to INITIAL_ACCURACY
+TRACKER_PRIOR_WEIGHT = 5.0  # CHANGED (06122026) pseudo-observations anchoring score to INITIAL_ACCURACY
 
 # ── Feature engineering ────────────────────────────────
 MIN_HISTORY_BARS = 70

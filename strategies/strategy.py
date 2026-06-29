@@ -60,6 +60,7 @@ class Strategy(_LumibotStrategy):
         self.paused = False
         self.asset_returns = {s: pd.Series(dtype=float) for s in self.all_symbols}
         self._prev_features = {}  # features from prior iteration for labeling
+        self.last_stop_loss_time = {}
 
         self.target_streak = {} # CHANGED (12062026) {symbol: consecutive iterations with positive target weight}
         self.exit_streak = {} # CHANGED (12062026) {symbol: consecutive iterations a held position is out of targets}
@@ -315,7 +316,29 @@ class Strategy(_LumibotStrategy):
         for p in self.get_positions():
             sym = p.asset.symbol
             current_positions[sym] = p
-
+        
+        # -- Independent stop-loss: fires regardless of model signal --
+        stop_loss_exited = set()
+        for symbol, position in list(current_positions.items()):
+            if position.quantity <= 0:
+                continue
+            price = prices.get(symbol, 0)
+            entry_price = self.entry_prices.get(symbol, 0)
+            if entry_price <= 0 or price <= 0:
+                continue
+            position_return = (price - entry_price) / entry_price
+            if position_return <= -P.MAX_POSITION_LOSS:
+                order = self.create_order(symbol, position.quantity, "sell")
+                self.submit_order(order)
+                self.entry_prices.pop(symbol, None)
+                self.accumulated_fees.pop(symbol, None)
+                self.exit_streak.pop(symbol, None)
+                self.target_streak.pop(symbol, None)
+                del current_positions[symbol]
+                self.log_message(f"STOP-LOSS {symbol}: return={position_return:.2%} @ ${price:,.2f}")
+                stop_loss_exited.add(symbol)
+                self.last_stop_loss_time[symbol] = self.get_datetime()
+        
         # -- Sell: exit positions not in targets or with negative weight -- 
         for symbol, position in current_positions.items():
             target_w = target_weights.get(symbol, 0)
@@ -327,16 +350,17 @@ class Strategy(_LumibotStrategy):
                 entry_price = self.entry_prices.get(symbol, 0)
 
                 # Stop-loss override: always allow sell if position is down too much
-                if entry_price > 0 and price > 0: # CHANGED (21062026)
-                    position_return = (price - entry_price) / entry_price
-                    is_stop_loss = position_return <= -P.MAX_POSITION_LOSS
-                    total_entry_value = position.quantity * entry_price
-                    total_buy_fees = self.accumulated_fees.get(symbol, 0)
-                    sell_fee = position.quantity * price * P.PERCENT_FEE_PER_SIDE
-                    min_profit_needed = (total_buy_fees + sell_fee) * P.MIN_SELL_PROFIT_MULTIPLIER / total_entry_value
-                    meets_profit_target = position_return >= min_profit_needed
-                    if not meets_profit_target and not is_stop_loss:
-                        continue  # price hasn't moved enough to justify selling
+                if entry_price <= 0 or price <= 0:
+                    continue
+                position_return = (price - entry_price) / entry_price
+                is_stop_loss = position_return <= -P.MAX_POSITION_LOSS
+                total_entry_value = position.quantity * entry_price
+                total_buy_fees = self.accumulated_fees.get(symbol, 0)
+                sell_fee = position.quantity * price * P.PERCENT_FEE_PER_SIDE
+                min_profit_needed = (total_buy_fees + sell_fee) * P.MIN_SELL_PROFIT_MULTIPLIER / total_entry_value
+                meets_profit_target = position_return >= min_profit_needed
+                if not meets_profit_target and not is_stop_loss:
+                    continue  # price hasn't moved enough to justify selling
 
                 order = self.create_order(symbol, position.quantity, "sell")
                 self.submit_order(order)
@@ -349,6 +373,13 @@ class Strategy(_LumibotStrategy):
 
         # -- Buy / adjust remaining positions --
         for symbol, weight in target_weights.items():
+            if symbol in stop_loss_exited:
+                continue
+            last_sl = self.last_stop_loss_time.get(symbol)
+            if last_sl is not None:
+                hours_since = (self.get_datetime() - last_sl).total_seconds() / 3600
+                if hours_since < P.STOP_LOSS_COOLDOWN_HOURS:
+                    continue
             if weight <= 0:
                 continue
 
@@ -425,3 +456,7 @@ class Strategy(_LumibotStrategy):
                 self.log_message(
                     f"LIQUIDATE {position.asset.symbol}: qty={position.quantity}"
                 )
+        self.entry_prices.clear()
+        self.accumulated_fees.clear()
+        self.target_streak.clear()
+        self.exit_streak.clear()
